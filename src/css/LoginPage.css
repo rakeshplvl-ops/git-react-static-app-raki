@@ -1,0 +1,110 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.LoginPage-Container{
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    align-items: center;
+}
+
+.LoginPage-Container *{
+    color: #f1f5f9;
+}
+
+.error-login *{
+    color: rgb(197, 0, 0);
+}
+
+.Register-note{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.LoginPage-Inner-Container{
+    width: 350px;
+    height: 350px;
+    padding: 30px;
+    border-radius: 10px;
+    background: #1e293b;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    align-items: center;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.196);
+}
+
+.input-container{
+    width: 100%;
+    padding: 2px;
+    margin: auto;
+    display: grid;
+    grid-template-rows: 1fr 3fr;
+    align-items: center;
+}
+
+.inputLabel{
+    text-align: start;
+    font-size: 15px;
+}
+
+.inputText{
+    width: 90%;
+    color: #1e293b;
+    margin: auto;
+    padding: 5px;
+}
+
+.submit-container{
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+}
+
+.SubmitBtn{
+    width: 90%;
+    background-color: green;
+    justify-self: center;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 30px;
+    text-align: center;
+
+    &:hover{
+        color: white;
+        background-color: rgba(0, 128, 0, 0.697);
+    }
+}
+
+.register-login{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.RegisterOrLogin{
+    cursor: pointer;
+
+    &:hover{
+        color: rgb(114, 168, 33);
+    }
+}
+
+.ForgotPassword{
+    cursor: pointer;
+
+    &:hover{
+        color: rgb(215, 33, 33);
+    }
+}
