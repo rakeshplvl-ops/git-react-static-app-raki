@@ -1,0 +1,16 @@
+.footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  padding: 16px 20px;
+  text-align: center;
+  color: white;
+}
+
+.footer-content {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.footer-content p {
+  margin: 0;
+}

@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import LoginPage from "./pages/LoginPage";
 import TasksDisplayPage from "./pages/TasksDisplayPage";
 import TaskDetail from "./pages/TaskDetail";
@@ -9,14 +10,17 @@ import HomePage from "./pages/HomePage";
 import PublicLayout from "./components/Layouts/PublicLayout";
 import AppLayout from "./components/Layouts/AppLayout";
 import ProfilePage from "./pages/ProfilePage";
+import EditProfilePage from "./pages/EditProfilePage";
 import CreateTaskPage from "./pages/CreateTaskPage";
 import AboutPage from "./pages/AboutPage";
+import { SearchProvider } from "./contexts/SearchContext";
 
 function App() {
   return (
-    <div className="site-container">
-      <Header />
-      <main className="main-container">
+    <SearchProvider>
+      <div className="site-container">
+        <Header />
+        <main className="main-container">
         <Routes>
           <Route element={<PublicLayout />}>
             <Route
@@ -73,6 +77,14 @@ function App() {
               }
             />
             <Route
+              path="/edit-profile"
+              element={
+                <ProtectedRoute>
+                  <EditProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/create-task"
               element={
                 <ProtectedRoute>
@@ -84,7 +96,9 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>
-    </div>
+    <Footer />
+  </div>
+    </SearchProvider>
   );
 }
 

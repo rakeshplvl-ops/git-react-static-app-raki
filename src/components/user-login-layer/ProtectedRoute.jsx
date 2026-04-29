@@ -4,7 +4,6 @@ import { useAuth } from "../../contexts/useAuth";
 function ProtectedRoute({ children }) {
   const { isLoggedIn } = useAuth();
 
-  console.log("ProtectedRoute - isLoggedIn:", isLoggedIn);
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }

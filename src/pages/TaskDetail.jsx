@@ -1,184 +1,166 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import "../css/component-css/TaskDetail.css";
-import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import "../css/task-form.css";
+import { useEffect, useState, useRef } from "react";
+import api from "../services/api";
 
 function TaskDetail() {
   const { id } = useParams();
-  const [task, SetTask] = useState(null);
-  const [error, SetError] = useState(null);
+  const [task, setTask] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
-  const updateData = (e) => {
-    const { name, value } = e.target;
-    SetTask((prevTask) => ({
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setTask((prevTask) => ({
       ...prevTask,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const SubmitData = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch(`https://localhost:7176/api/Tasks/UpdateTask/${task.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-      body: JSON.stringify(task),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          SetError("Failed to update task. Please try again.");
-          console.log("Network response was not ok");
-          return null;
-        }
-        const data = response.json();
-        console.log("Task updated successfully:", data);
-        return response.json();
-      })
-      .catch((error) => {
-        console.error("Error updating task:", error);
-      });
-    navigate("/tasks");
+    try {
+      const res = await api.put(`/Tasks/UpdateTask/${task.id}`, task);
+      console.log("Task updated successfully:", res.data);
+      navigate("/tasks");
+    } catch (error) {
+      setError("Failed to update task. Please try again.");
+      console.error("Error updating task:", error);
+    }
   };
 
   useEffect(() => {
     console.log("Fetching task data for ID:", id);
     const loadTask = async () => {
-      const response = await fetch(
-        `https://localhost:7176/api/Tasks/GetTask/${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        },
-      );
-
-      const text = await response.text();
-
-      if (!response.ok) {
-        SetError("Failed to load task. Please try again.");
-        console.log("Network response was not ok");
-        return;
+      try {
+        const res = await api.get(`/Tasks/GetTask/${id}`);
+        setTask(res.data);
+      } catch (error) {
+        setError("Failed to load task. Please try again.");
+        console.error("Error loading task:", error);
       }
-
-      const data = JSON.parse(text); // ✅ actual object
-      SetTask(data); // ✅ correct
     };
 
     loadTask();
   }, [id]);
 
   if (!task) {
-    return <div>Loading...</div>;
+    return <div className="task-form-container"><div className="task-form-card"><p style={{ color: '#94a3b8' }}>Loading...</p></div></div>;
   }
 
   return (
-    <div className="task-detail-outer-container">
-      <div className="task-detail-inner-container">
-        <div className="title-date-container">
-          <label htmlFor="task-title" className="task-title-label">
-            Title
-          </label>
-          <div className="date-entry">
-            <div className="date-container">
-              <label htmlFor="startDate" className="start-date">
-                Start Date
-              </label>
+    <div className="task-form-container">
+      <div className="task-form-card">
+        <h2>Edit Task</h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="task-form-row">
+            <div className="task-form-group">
+              <label className="task-form-label">Title</label>
+              <input
+                type="text"
+                value={task.taskName ?? ""}
+                onChange={handleChange}
+                name="taskName"
+                placeholder="Enter task title"
+                className="task-form-input title-input"
+              />
+            </div>
+
+            <div className="task-form-date-wrapper">
+              <label className="task-form-label">Start Date</label>
               <input
                 type="date"
-                id="startDate"
-                name="startDate"
-                className="start-date-input input-text"
-                onChange={updateData}
                 value={task.startDate ?? ""}
+                onChange={handleChange}
+                name="startDate"
+                className="task-form-date-input"
               />
             </div>
-            <div className="date-container">
-              <label htmlFor="endDate" className="end-date">
-                End Date
-              </label>
+
+            <div className="task-form-date-wrapper">
+              <label className="task-form-label">End Date</label>
               <input
                 type="date"
-                id="endDate"
-                name="endDate"
-                className="end-date-input input-text"
-                onChange={updateData}
                 value={task.endDate ?? ""}
+                onChange={handleChange}
+                name="endDate"
+                className="task-form-date-input"
               />
             </div>
-          </div>
-        </div>
-        <div className="title-activeStatus-contianer">
-          <input
-            type="text"
-            id="task-title"
-            className="task-title-input input-text"
-            name="taskName"
-            onChange={updateData}
-            value={task.taskName ?? ""}
-          />
-          <div className="active-status-toggler">
-            <label htmlFor="activeStatus" className="active-status-label">
-              Active
+
+            <label className="task-form-checkbox-wrapper">
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  setTask((prevTask) => ({
+                    ...prevTask,
+                    taskStatus: e.target.checked,
+                  }));
+                }}
+                checked={task.taskStatus ?? false}
+                name="taskStatus"
+                className="task-form-checkbox"
+              />
+              <span className="task-form-checkbox-label">Active</span>
             </label>
+          </div>
+
+          <div className="task-form-group" style={{ marginBottom: "16px" }}>
+            <label className="task-form-label">Short Description</label>
             <input
-              type="checkbox"
-              id="activeStatus"
-              name="status"
-              className="active-status-input input-text"
-              onChange={(e) => {
-                SetTask((prevTask) => ({
-                  ...prevTask,
-                  taskStatus: e.target.checked,
-                }));
-              }}
-              checked={task.taskStatus ?? false}
+              type="text"
+              placeholder="Brief summary of the task"
+              className="task-form-input"
+              value={task.shortDescription ?? ""}
+              onChange={handleChange}
+              name="shortDescription"
             />
           </div>
-        </div>
-        <label htmlFor="shortDescription" className="short-description-label">
-          Short Description
-        </label>
-        <input
-          type="text"
-          id="shortDescription"
-          className="short-description-input input-text"
-          name="shortDescription"
-          onChange={updateData}
-          value={task.shortDescription ?? ""}
-        />
-        <label htmlFor="longDescription" className="long-description-label">
-          Long Description
-        </label>
-        <textarea
-          id="longDescription"
-          cols="30"
-          rows="5"
-          name="longDescription"
-          onChange={updateData}
-          className="long-description-input input-text"
-          value={task.longDescription ?? ""}
-        />
-        <div className="add-files">
-          <label htmlFor="fileUpload" className="add-files-label">
-            + Add Files
-          </label>
-          <input
-            type="file"
-            hidden
-            id="fileUpload"
-            className="add-files-input input-text"
-          />
-        </div>
+
+          <div className="task-form-group" style={{ marginBottom: "16px" }}>
+            <label className="task-form-label">Long Description</label>
+            <textarea
+              placeholder="Detailed description of the task"
+              className="task-form-textarea"
+              value={task.longDescription ?? ""}
+              onChange={handleChange}
+              name="longDescription"
+            />
+          </div>
+
+          <div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              multiple
+              style={{ display: "none" }}
+            />
+            <label
+              className="task-form-file-label"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              + Add Files
+            </label>
+          </div>
+
+          <div className="task-form-actions">
+            <button
+              type="button"
+              className="task-form-btn task-form-btn-secondary"
+              onClick={() => navigate("/tasks")}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="task-form-btn task-form-btn-primary">
+              Save Changes
+            </button>
+          </div>
+
+          {error && <div className="task-form-error">{error}</div>}
+        </form>
       </div>
-      <div className="savebtn">
-        <button className="savebtn-button" onClick={SubmitData}>
-          Save
-        </button>
-      </div>
-      {error && <div className="error-message">{error}</div>}
     </div>
   );
 }

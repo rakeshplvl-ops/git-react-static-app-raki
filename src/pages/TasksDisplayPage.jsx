@@ -1,81 +1,69 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import api from "../services/api";
 import Task from "../components/Task";
 import "../css/TasksDisplayPage.css";
 import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/useAuth";
+import { useSearch } from "../contexts/SearchContext";
 
 function TasksDisplayPage() {
   const { filter } = useParams();
-  const [Tasks, SetTasks] = useState([]);
+  const [Tasks, setTasks] = useState([]);
   const [DeleteTask, SetDeleteTask] = useState(null);
-  const { setIsLoggedIn, setUser } = useAuth();
-  const navigate = useNavigate();
+  const { searchQuery } = useSearch();
 
-  const handleDelete = () => {
-    fetch(`https://localhost:7176/api/Tasks/DeleteTask/${DeleteTask.id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    })
-      .then(async (response) => {
-        const text = await response.text();
-        if (!response.ok) {
-          SetDeleteTask(null);
-          return null;
-        }
-        console.log("Task deleted successfully:", text);
-        SetTasks((prev) => prev.filter((t) => t.id !== DeleteTask.id));
-        SetDeleteTask(null);
-      })
-      .catch((error) => {
-        console.error("Error deleting task:", error);
-      });
+  const handleDelete = async () => {
+    try {
+      const res = await api.delete(`/Tasks/DeleteTask/${DeleteTask.id}`);
+      console.log("Task deleted successfully:", res.data);
+      setTasks((prev) => prev.filter((t) => t.id !== DeleteTask.id));
+      SetDeleteTask(null);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      SetDeleteTask(null);
+    }
   };
 
   useEffect(() => {
-    const fetchTasks = () => {
-      fetch("https://localhost:7176/api/Tasks/GetTasks", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      })
-        .then(async (response) => {
-          if (!response.ok) {
-            SetTasks(null);
-            if (response.status === 401) {
-              alert("Session expired. Please log in again.");
-              localStorage.removeItem("accessToken");
-              localStorage.removeItem("isLoggedIn");
-              setIsLoggedIn(false);
-              setUser(null);
-              navigate("/login");
-            }
-            return null;
-          } else {
-            let data = await response.json();
-            console.log("Fetched tasks:", data);
-            data.sort((a, b) => a.taskNumber - b.taskNumber);
+    const fetchTasks = async () => {
+      try {
+        const res = await api.get("/Tasks/GetTasks");
 
-            if (filter === "completed") {
-              data = data.filter((task) => task.taskStatus === false);
-            }
+        let data = res.data;
 
-            SetTasks(data);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching tasks:", error);
-        });
+        console.log("Fetched tasks:", data);
+
+        data.sort((a, b) => a.taskNumber - b.taskNumber);
+
+        if (filter === "completed") {
+          data = data.filter((task) => task.taskStatus === false);
+        }
+
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
     };
-    fetchTasks();
-  }, [filter, setIsLoggedIn, setUser, navigate]);
 
-  if (Tasks == null || Tasks.length === 0) {
+    fetchTasks();
+  }, [filter]);
+
+  // Filter tasks based on search query
+  const filteredTasks = Tasks.filter((task) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      task.taskName?.toLowerCase().includes(query) ||
+      task.shortDescription?.toLowerCase().includes(query) ||
+      task.longDescription?.toLowerCase().includes(query)
+    );
+  });
+
+  if (filteredTasks.length === 0) {
     return (
       <div className="tasks-page-container">
-        <div className="no-tasks-message">No tasks available.</div>
+        <div className="no-tasks-message">
+          {searchQuery ? `No tasks matching "${searchQuery}"` : "No tasks available."}
+        </div>
       </div>
     );
   }
@@ -84,14 +72,20 @@ function TasksDisplayPage() {
     <div className="tasks-page-container">
       <div className="tasks-container">
         <div className="tasks-inner-container">
-          {Tasks.map((item, index) => (
+          {filteredTasks.map((item, index) => (
             <Link
               to={`/TaskDetail/${item.taskName}`}
               key={index}
               className="tasks-link"
             >
               <div className="item" key={index}>
-                {<Task task={item} number = {index} onDelete={() => SetDeleteTask(item)} />}
+                {
+                  <Task
+                    task={item}
+                    number={index}
+                    onDelete={() => SetDeleteTask(item)}
+                  />
+                }
               </div>
             </Link>
           ))}

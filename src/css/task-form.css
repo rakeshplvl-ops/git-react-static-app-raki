@@ -1,0 +1,226 @@
+/* Shared task form styles for CreateTask and TaskDetail */
+.task-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  flex: 1;
+}
+
+.task-form-card {
+  width: 100%;
+  max-width: 700px;
+  background: var(--bg-secondary);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.task-form-card h2 {
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.task-form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .task-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.task-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task-form-label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.task-form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  outline: none;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.task-form-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.task-form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.task-form-input.title-input {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Date input styling */
+.task-form-date-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.task-form-date-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  outline: none;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.task-form-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* Make entire date wrapper clickable */
+.task-form-date-wrapper:has(.task-form-date-input:focus) {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  border-radius: 10px;
+}
+
+/* Checkbox styling */
+.task-form-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.task-form-checkbox-wrapper:hover {
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
+  border-color: var(--accent-primary);
+}
+
+.task-form-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+
+.task-form-checkbox-label {
+  color: var(--text-primary);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Textarea styling */
+.task-form-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  outline: none;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.task-form-textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* File upload */
+.task-form-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: color 0.2s;
+}
+
+.task-form-file-label:hover {
+  color: var(--accent-primary);
+}
+
+/* Actions */
+.task-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.task-form-btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.task-form-btn:active {
+  transform: scale(0.98);
+}
+
+.task-form-btn-primary {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.task-form-btn-primary:hover {
+  background: #4f46e5;
+}
+
+.task-form-btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.task-form-btn-secondary:hover {
+  background: #3f4554;
+}
+
+/* Error message */
+.task-form-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--accent-danger);
+  border-radius: 10px;
+  color: #fca5a5;
+  font-size: 14px;
+}

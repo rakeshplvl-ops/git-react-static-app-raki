@@ -1,20 +1,18 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../css/LoginPage.css";
 import { useAuth } from "../contexts/useAuth";
+import api from "../services/api";
+import { setTokens, setUserData } from "../services/authStore";
 
 function LoginPage() {
   const [UserName, SetUserName] = useState("");
   const [Password, SetPassword] = useState("");
-  const [RegisterOrLogin, SetRegisterOrLogin] = useState(false);
+  const [isRegister, SetIsRegister] = useState(false);
   const [Registered, SetRegistered] = useState(false);
-  const navigate = useNavigate();
-  const { setUser, setIsLoggedIn } = useAuth();
+  const { login } = useAuth();
   const [error, setError] = useState(false);
-
-  const endpointquery = RegisterOrLogin
-    ? "https://localhost:7176/api/User/register"
-    : "https://localhost:7176/api/User/login";
+  const navigate = useNavigate();
 
   if (Registered) {
     return (
@@ -36,77 +34,61 @@ function LoginPage() {
     );
   }
 
-  const setAccessToken = async (data) => {
-    console.log("Setting access token with data:", data);
-    localStorage.setItem("accessToken", data.accessToken);
-    localStorage.setItem("isLoggedIn", "true");
-    setIsLoggedIn(true);
-    console.log("Access Token set:", data.accessToken);
-    console.log("refresh token:", data.refreshToken);
-    await setUserData(data.refreshToken);
-    navigate("/");
+  // gets user data
+  const fetchUserData = async (refreshToken) => {
+    console.log("Fetching user data with token:", refreshToken);
+    try {
+      // Backend expects [FromBody]string - needs JSON string format
+      const res = await api.post(
+        "/User/get-user",
+        JSON.stringify(refreshToken),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+      console.log("User Data:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      return null;
+    }
   };
 
-  const setUserData = async (token) => {
-    console.log("Fetching user data with token:", token);
-    await fetch(`https://localhost:7176/api/User/get-user/${token}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
-    })
-      .then(async (response) => {
-        const responseData = await response.text();
-        if (!response.ok) {
-          throw new Error(responseData || "Network response was not ok");
-        }
-        return JSON.parse(responseData);
-      })
-      .then((data) => {
-        console.log("User Data:", data);
-        localStorage.setItem("userData", JSON.stringify(data));
-        setUser(data);
-      })
-      .catch((error) => {
-        console.log(typeof token);
-        console.error("Error:", error);
-      });
-  };
-
-  const LoginUser = () => {
-    const endpoint = endpointquery;
+  // login with creds
+  const LoginUser = async () => {
+    const endpoint = isRegister ? "/User/register" : "/User/login";
     const payload = {
       username: UserName,
       password: Password,
     };
 
-    fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then(async (response) => {
-        const responseData = await response.text();
-        if (!response.ok) {
-          setError(true);
-          throw new Error(responseData || "Network response was not ok");
-        }
-        return JSON.parse(responseData);
-      })
-      .then((data) => {
-        console.log("Success:", data);
-        setError(false);
-        if (RegisterOrLogin) {
-          return SetRegistered(true);
-        }
-        setAccessToken(data);
-      })
-      .catch((error) => {
-        setError(true);
-        console.error("Error:", error);
-      });
+    try {
+      const res = await api.post(endpoint, payload);
+      console.log("Success:", res.data);
+      setError(false);
+
+      if (isRegister) {
+        return SetRegistered(true);
+      }
+
+      // Store tokens first so API has Bearer token for user fetch
+      setTokens(res.data.accessToken, res.data.refreshToken);
+
+      // Fetch user data
+      const userData = await fetchUserData(res.data.refreshToken);
+
+      // Store user data for session persistence
+      setUserData(userData);
+
+      // Update React state
+      login(res.data.accessToken, res.data.refreshToken, userData);
+      console.log(res.data.accessToken, res.data.refreshToken, userData);
+      // Navigate after login completes
+      navigate("/");
+    } catch (error) {
+      setError(true);
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -145,20 +127,23 @@ function LoginPage() {
             onChange={(e) => {
               SetPassword(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") LoginUser();
+            }}
           />
         </div>
         <div className="submit-container">
           <button className="SubmitBtn" onClick={LoginUser}>
-            {RegisterOrLogin ? "Register" : "Login"}
+            {isRegister ? "Register" : "Login"}
           </button>
           <div className="register-login">
             <div
               className="RegisterOrLogin"
               onClick={() => {
-                SetRegisterOrLogin(!RegisterOrLogin);
+                SetIsRegister(!isRegister);
               }}
             >
-              {RegisterOrLogin ? "Login" : "Register"}
+              {isRegister ? "Login" : "Register"}
             </div>
             <a className="ForgotPassword">Forgot Password ?</a>
           </div>

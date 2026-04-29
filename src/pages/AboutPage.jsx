@@ -1,9 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import "../css/AboutPage.css";
 
 function AboutPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="about-container">
       <div className="about-card">
+        <button className="about-close-btn" onClick={() => navigate(-1)}>
+          ✕
+        </button>
         <h1>About</h1>
 
         <p>
