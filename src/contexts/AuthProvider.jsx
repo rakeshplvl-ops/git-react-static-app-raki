@@ -1,10 +1,18 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
-import { setTokens, clearTokens, hasRefreshToken, setUserData, getUserData, clearUserData } from "../services/authStore";
+import api from "../services/api";
+import {
+  setTokens,
+  clearTokens,
+  setUserData,
+  getUserData,
+  clearUserData,
+  getRefreshToken,
+} from "../services/authStore";
 
 export function AuthProvider({ children }) {
   // Restore session synchronously from localStorage on first render
-  const [isLoggedIn, setIsLoggedIn] = useState(() => !!hasRefreshToken());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(() => getUserData());
 
   const login = useCallback((accessToken, refreshToken, userData) => {
@@ -21,11 +29,35 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false);
   }, []);
 
+  //app start
+  useEffect(() => {
+    const appInit = async () => {
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        setIsLoggedIn(false);
+        return;
+      }
+
+      try {
+        const res = await api.post("User/refresh", {
+          refreshToken,
+        });
+
+        setTokens(res.data.accessToken, res.data.refreshToken);
+        setIsLoggedIn(true);
+      } catch {
+        clearTokens();
+        setIsLoggedIn(false);
+      }
+    };
+
+    appInit();
+  }, []);
+
   // Always render the Provider so children can access context
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, user, setUser, login, logout }}
-    >
+    <AuthContext.Provider value={{ isLoggedIn, user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

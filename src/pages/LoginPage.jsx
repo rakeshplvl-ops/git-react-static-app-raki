@@ -11,7 +11,8 @@ function LoginPage() {
   const [isRegister, SetIsRegister] = useState(false);
   const [Registered, SetRegistered] = useState(false);
   const { login } = useAuth();
-  const [error, setError] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   if (Registered) {
@@ -65,7 +66,7 @@ function LoginPage() {
     try {
       const res = await api.post(endpoint, payload);
       console.log("Success:", res.data);
-      setError(false);
+      setIsError(false);
 
       if (isRegister) {
         return SetRegistered(true);
@@ -86,16 +87,17 @@ function LoginPage() {
       // Navigate after login completes
       navigate("/");
     } catch (error) {
-      setError(true);
+      setError(error.response?.data || "Login failed");
+      setIsError(true);
       console.error("Error:", error);
     }
   };
 
   return (
     <div className="LoginPage-Container">
-      {error && (
+      {isError && (
         <div className="error-login">
-          <p>Error login : server down to login, please try again later ..!</p>
+          <p>{error}</p>
         </div>
       )}
       <div className="LoginPage-Inner-Container">

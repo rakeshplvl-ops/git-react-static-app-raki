@@ -2,6 +2,9 @@
 let accessToken = localStorage.getItem("accessToken") || null;
 let refreshToken = localStorage.getItem("refreshToken") || null;
 
+export const getAccessToken = () => accessToken;
+export const getRefreshToken = () => refreshToken;
+
 export const setTokens = (access, refresh) => {
   accessToken = access;
   refreshToken = refresh;
@@ -9,17 +12,12 @@ export const setTokens = (access, refresh) => {
   localStorage.setItem("refreshToken", refresh);
 };
 
-export const getAccessToken = () => accessToken;
-export const getRefreshToken = () => refreshToken;
-
 export const clearTokens = () => {
   accessToken = null;
   refreshToken = null;
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
 };
-
-export const hasRefreshToken = () => !!refreshToken;
 
 // User data persistence
 export const setUserData = (userData) => {

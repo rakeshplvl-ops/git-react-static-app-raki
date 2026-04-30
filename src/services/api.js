@@ -1,5 +1,11 @@
 import axios from "axios";
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./authStore";
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+  clearUserData,
+} from "./authStore";
 
 const api = axios.create({
   baseURL: "https://localhost:7176/api/",
@@ -29,8 +35,17 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthRequest =
+      originalRequest.url.includes("/User/login") ||
+      originalRequest.url.includes("/User/refresh");
+    console.log(error.response);
+    
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRequest
+    ) {
+      await window.prompt("inside ..!");
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -50,9 +65,12 @@ api.interceptors.response.use(
       const refreshToken = getRefreshToken();
 
       try {
-        const res = await axios.post("https://localhost:7176/api/User/refresh", {
-          refreshToken,
-        });
+        const res = await axios.post(
+          "https://localhost:7176/api/User/refresh",
+          {
+            refreshToken,
+          },
+        );
 
         const newAccessToken = res.data.accessToken;
         const newRefreshToken = res.data.refreshToken;
@@ -68,6 +86,7 @@ api.interceptors.response.use(
 
         // logout user
         clearTokens();
+        clearUserData();
         window.location.href = "/login";
 
         return Promise.reject(err);
