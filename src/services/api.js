@@ -11,7 +11,7 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-// attach access token
+// attaching access token
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
