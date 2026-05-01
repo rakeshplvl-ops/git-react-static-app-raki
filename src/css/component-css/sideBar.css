@@ -35,3 +35,9 @@
 .link-text{
     padding: 10px;
 }
+
+@media (max-width: 640px) {
+    .side-bar {
+        display: none !important;
+    }
+}
