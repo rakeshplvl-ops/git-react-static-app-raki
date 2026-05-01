@@ -34,7 +34,11 @@ export function AuthProvider({ children }) {
     const appInit = async () => {
       const refreshToken = getRefreshToken();
 
-      if (!refreshToken) {
+      if (
+        !refreshToken ||
+        refreshToken === "null" ||
+        refreshToken === "undefined"
+      ) {
         setIsLoggedIn(false);
         return;
       }
@@ -46,7 +50,8 @@ export function AuthProvider({ children }) {
 
         setTokens(res.data.accessToken, res.data.refreshToken);
         setIsLoggedIn(true);
-      } catch {
+      } catch (err) {
+        console.log("App start trail failed : ", err.data);
         clearTokens();
         setIsLoggedIn(false);
       }
