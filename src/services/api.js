@@ -45,7 +45,6 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       !isAuthRequest
     ) {
-      await window.prompt("inside ..!");
       originalRequest._retry = true;
 
       if (isRefreshing) {
