@@ -11,6 +11,7 @@ function EditProfilePage() {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    contact: user?.contact || "",
     username: user?.username || "",
     password: "",
     confirmPassword: "",
@@ -41,6 +42,7 @@ function EditProfilePage() {
         id: user.id,
         name: formData.name,
         email: formData.email,
+        contact: formData.contact,
         username: formData.username,
       };
 
@@ -118,6 +120,18 @@ function EditProfilePage() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Your email"
+              className="task-form-input"
+            />
+          </div>
+
+          <div className="task-form-group" style={{ marginBottom: "16px" }}>
+            <label className="task-form-label">Contact</label>
+            <input
+              type="tel"
+              name="contact"
+              value={formData.contact}
+              onChange={handleChange}
+              placeholder="Your contact number"
               className="task-form-input"
             />
           </div>
