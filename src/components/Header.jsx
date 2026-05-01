@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/useAuth";
 import { useSearch } from "../contexts/SearchContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../css/header.css";
 import ProfileMenu from "./ProfileMenu";
 
@@ -10,6 +10,10 @@ function Header() {
   const [showNotification, setShowNotification] = useState(false);
   const { isLoggedIn } = useAuth();
   const { searchQuery, setSearchQuery } = useSearch();
+  const location = useLocation();
+
+  const showSearch =
+    location.pathname === "/tasks" || location.pathname === "/tasks/:filter";
 
   const navigate = useNavigate();
 
@@ -53,22 +57,29 @@ function Header() {
   return (
     <div className="header-container">
       <div className="header-inner-container">
-        <h3 className="header-name" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Taskz</h3>
+        <h3
+          className="header-name"
+          onClick={() => navigate("/")}
+          style={{ cursor: "pointer" }}
+        >
+          Taskz
+        </h3>
         <input
           type="text"
-          disabled={!isLoggedIn}
+          disabled={!showSearch || !isLoggedIn}
           className="header-search"
           placeholder="search taskz"
           value={searchQuery}
           onChange={handleSearchChange}
         />
         <div className="header-options">
-          <div className="header-option notification-wrapper" onClick={handleNotificationClick}>
+          <div
+            className="header-option notification-wrapper"
+            onClick={handleNotificationClick}
+          >
             🔔
             {showNotification && (
-              <div className="notification-tooltip">
-                No new notifications
-              </div>
+              <div className="notification-tooltip">No new notifications</div>
             )}
           </div>
           <div className="profile-icon header-option">

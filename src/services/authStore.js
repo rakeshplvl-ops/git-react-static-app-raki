@@ -6,17 +6,22 @@ export const getAccessToken = () => accessToken;
 export const getRefreshToken = () => refreshToken;
 
 export const setTokens = (access, refresh) => {
-  accessToken = access;
-  refreshToken = refresh;
+  console.log("Setting refresh token:", refresh);
   localStorage.setItem("accessToken", access);
   localStorage.setItem("refreshToken", refresh);
+  accessToken = access;
+  refreshToken = refresh;
+  console.log(
+    "After set - stored refresh token:",
+    localStorage.getItem("refreshToken"),
+  );
 };
 
 export const clearTokens = () => {
-  accessToken = null;
-  refreshToken = null;
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
+  accessToken = null;
+  refreshToken = null;
 };
 
 // User data persistence

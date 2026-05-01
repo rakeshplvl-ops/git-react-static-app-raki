@@ -3,7 +3,6 @@ import { useState } from "react";
 import "../css/LoginPage.css";
 import { useAuth } from "../contexts/useAuth";
 import api from "../services/api";
-import { setTokens, setUserData } from "../services/authStore";
 
 function LoginPage() {
   const [UserName, SetUserName] = useState("");
@@ -19,11 +18,16 @@ function LoginPage() {
     return (
       <div className="Register-Container">
         <div className="Register-note">
-          <p>
+          <p style={{ color: "white" }}>
             User registration successful ..! Return to{" "}
             <div
-              style={{ display: "inline-block" }}
+              style={{
+                display: "inline-block",
+                color: "green",
+                cursor: "pointer",
+              }}
               onClick={() => {
+                SetIsRegister(false);
                 SetRegistered(false);
               }}
             >
@@ -72,18 +76,19 @@ function LoginPage() {
         return SetRegistered(true);
       }
 
-      // Store tokens first so API has Bearer token for user fetch
-      setTokens(res.data.accessToken, res.data.refreshToken);
-
       // Fetch user data
       const userData = await fetchUserData(res.data.refreshToken);
 
       // Store user data for session persistence
-      setUserData(userData);
 
       // Update React state
       login(res.data.accessToken, res.data.refreshToken, userData);
-      console.log(res.data.accessToken, res.data.refreshToken, userData);
+      console.log(
+        "check this",
+        res.data.accessToken,
+        res.data.refreshToken,
+        userData,
+      );
       // Navigate after login completes
       navigate("/");
     } catch (error) {

@@ -81,6 +81,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (err) {
+        console.log("caught error api.js : ", err);
         processQueue(err, null);
 
         // logout user

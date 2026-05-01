@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import api from "../services/api";
 import {
@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
   // Restore session synchronously from localStorage on first render
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(() => getUserData());
+  const [isLoading, setIsLoading] = useState(true);
 
   const login = useCallback((accessToken, refreshToken, userData) => {
     setTokens(accessToken, refreshToken);
@@ -31,38 +32,42 @@ export function AuthProvider({ children }) {
 
   //app start
   useEffect(() => {
-    const appInit = async () => {
+    const initAuth = async () => {
       const refreshToken = getRefreshToken();
 
-      if (
-        !refreshToken ||
-        refreshToken === "null" ||
-        refreshToken === "undefined"
-      ) {
+      if (!refreshToken) {
         setIsLoggedIn(false);
+        setIsLoading(false);
         return;
       }
 
       try {
+        setIsLoading(true);
         const res = await api.post("User/refresh", {
           refreshToken,
         });
 
         setTokens(res.data.accessToken, res.data.refreshToken);
+
         setIsLoggedIn(true);
       } catch (err) {
-        console.log("App start trail failed : ", err.data);
+        console.log(err);
         clearTokens();
+        clearUserData();
         setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false); // 👈 always stop loading
       }
     };
 
-    appInit();
+    initAuth();
   }, []);
 
   // Always render the Provider so children can access context
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, setUser, login, logout }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, user, setUser, login, logout, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
