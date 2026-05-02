@@ -45,9 +45,8 @@ function App() {
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/login" element={<LoginPage className="LoginPage-Site-Container" />} />
+            <Route path="/" element={<HomePage />} />
           </Route>
-
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
 
           <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
             <Route path="/tasks" element={<TasksDisplayPage />} />

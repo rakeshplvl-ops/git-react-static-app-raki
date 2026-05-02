@@ -8,7 +8,7 @@ import { useToast } from "../contexts/ToastContext";
 
 function HomePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
   const [quickTask, setQuickTask] = useState("");
@@ -79,6 +79,44 @@ function HomePage() {
       setIsSubmitting(false);
     }
   };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="home-container fade-in guest-home">
+        <section className="hero">
+          <div className="hero-badge">Next-Gen Task Management</div>
+          <h1 className="hometitle">Master your day with <span className="highlight">Taskz</span></h1>
+          <p className="subtitle">
+            The minimal, lightning-fast workspace for your daily goals. Organize, track, and crush your tasks with ease.
+          </p>
+          
+          <div className="hero-actions">
+            <button className="primary-hero-btn" onClick={() => navigate("/login")}>
+              Get Started for Free
+            </button>
+            <button className="secondary-hero-btn" onClick={() => navigate("/about")}>
+              Learn More
+            </button>
+          </div>
+        </section>
+
+        <div className="preview-grid">
+           <div className="preview-card glass">
+              <h3>⚡ Speed</h3>
+              <p>Add tasks in seconds with our quick-entry system.</p>
+           </div>
+           <div className="preview-card glass">
+              <h3>🛡️ Secure</h3>
+              <p>Your data is protected with industry-standard security.</p>
+           </div>
+           <div className="preview-card glass">
+              <h3>📱 Fluid</h3>
+              <p>Work seamlessly across desktop and mobile devices.</p>
+           </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="home-container fade-in">

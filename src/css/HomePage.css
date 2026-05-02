@@ -232,3 +232,115 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 🏰 Guest Landing Page Styles */
+.guest-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: calc(100vh - 200px);
+}
+
+.guest-home .hero {
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 4rem;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-primary);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.primary-hero-btn {
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+}
+
+.primary-hero-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(79, 70, 229, 0.5);
+  filter: brightness(1.1);
+}
+
+.secondary-hero-btn {
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid var(--glass-border);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.secondary-hero-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 2rem;
+}
+
+.preview-card {
+  padding: 2.5rem;
+  border-radius: 24px;
+  text-align: center;
+}
+
+.preview-card h3 {
+  color: var(--accent-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.preview-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .primary-hero-btn, .secondary-hero-btn {
+    width: 100%;
+  }
+}
