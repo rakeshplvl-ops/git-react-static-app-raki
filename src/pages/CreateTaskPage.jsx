@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import "../css/task-form.css";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -7,7 +7,6 @@ import { useToast } from "../contexts/ToastContext";
 function CreateTaskPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const fileInputRef = useRef(null);
   const [task, setTask] = useState({
     taskName: "",
     shortDescription: "",
@@ -35,7 +34,7 @@ function CreateTaskPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!task.taskName.trim()) {
       alert("Title is required");

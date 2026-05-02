@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../contexts/ToastContext";
 import "../css/component-css/Skeleton.css";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import api from "../services/api";
 
 function TaskDetail() {
@@ -82,8 +82,8 @@ function TaskDetail() {
         <div className="task-form-card" style={{ textAlign: "center" }}>
           <h2 style={{ color: "var(--accent-danger)" }}>⚠️ Connection Error</h2>
           <p>{error}</p>
-          <button 
-            className="task-form-btn task-form-btn-primary" 
+          <button
+            className="task-form-btn task-form-btn-primary"
             style={{ marginTop: "20px" }}
             onClick={() => navigate("/tasks")}
           >

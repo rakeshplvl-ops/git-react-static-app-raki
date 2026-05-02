@@ -12,7 +12,7 @@ function TasksDisplayPage() {
   const [Tasks, setTasks] = useState([]);
   const [DeleteTask, SetDeleteTask] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { searchQuery } = useSearch();
+  const { searchQuery, setSearchQuery } = useSearch();
   const { showToast } = useToast();
 
   const handleDelete = async () => {
