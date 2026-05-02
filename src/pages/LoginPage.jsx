@@ -10,6 +10,8 @@ function LoginPage() {
   const [Password, SetPassword] = useState("");
   const [isRegister, SetIsRegister] = useState(false);
   const [Registered, SetRegistered] = useState(false);
+  const [Email, SetEmail] = useState("");
+  const [Contact, SetContact] = useState("");
   const { login } = useAuth();
   const { showToast } = useToast();
   const [isError, setIsError] = useState(false);
@@ -69,12 +71,16 @@ function LoginPage() {
       if (Password.trim().length < 8) {
         return showToast("Password must be at least 8 characters long for registration.", "error");
       }
+      if (!Email.includes("@")) {
+        return showToast("Please enter a valid email address.", "error");
+      }
     }
 
     const endpoint = isRegister ? "/User/register" : "/User/login";
     const payload = {
       username: UserName,
       password: Password,
+      ...(isRegister && { email: Email, contact: Contact })
     };
 
     try {
@@ -131,6 +137,42 @@ function LoginPage() {
             }}
           />
         </div>
+
+        {isRegister && (
+          <>
+            <div className="input-container">
+              <label className="inputLabel" htmlFor="Email">
+                Email
+              </label>
+              <input
+                className="inputText"
+                type="email"
+                name="Email"
+                id="Email"
+                value={Email}
+                onChange={(e) => {
+                  SetEmail(e.target.value);
+                }}
+              />
+            </div>
+            <div className="input-container">
+              <label className="inputLabel" htmlFor="Contact">
+                Contact
+              </label>
+              <input
+                className="inputText"
+                type="text"
+                name="Contact"
+                id="Contact"
+                value={Contact}
+                onChange={(e) => {
+                  SetContact(e.target.value);
+                }}
+              />
+            </div>
+          </>
+        )}
+
         <div className="input-container">
           <label className="inputLabel" htmlFor="password">
             Password
