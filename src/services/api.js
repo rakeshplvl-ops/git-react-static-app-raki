@@ -38,7 +38,6 @@ api.interceptors.response.use(
     const isAuthRequest =
       originalRequest.url.includes("/User/login") ||
       originalRequest.url.includes("/User/refresh");
-    console.log(error.response);
 
     if (
       error.response?.status === 401 &&
@@ -65,7 +64,7 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "https://localhost:7176/api/User/refresh",
+          `${import.meta.env.VITE_API_BASE_URL}/User/refresh`,
           {
             refreshToken,
           },
@@ -81,7 +80,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (err) {
-        console.log("caught error api.js : ", err);
+        console.error("Token refresh failed:", err);
         processQueue(err, null);
 
         // logout user
@@ -93,6 +92,13 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // 🌐 GLOBAL OFFLINE DETECTION
+    if (!error.response) {
+      console.error("Backend server is unreachable.");
+      window.dispatchEvent(new CustomEvent("server-offline", { detail: "Server is unreachable" }));
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);

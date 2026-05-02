@@ -1,10 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import "../css/ProfilePage.css";
 import { useAuth } from "../contexts/useAuth";
+import { useEffect, useState } from "react";
 
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener("server-offline", handleOffline);
+    return () => window.removeEventListener("server-offline", handleOffline);
+  }, []);
 
   function handleLogout() {
     logout();
@@ -37,7 +45,7 @@ function ProfilePage() {
 
         <div className="info">
           <p>
-            <strong>Status:</strong> Logged In
+            <strong>Status:</strong> {isOffline ? <span style={{ color: "var(--accent-warning)" }}>⚠️ Offline (Cached)</span> : "Logged In"}
           </p>
         </div>
 

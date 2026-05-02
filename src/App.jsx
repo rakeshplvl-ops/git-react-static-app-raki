@@ -1,4 +1,6 @@
 import { Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useToast } from "./contexts/ToastContext";
 import "./App.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -16,83 +18,46 @@ import AboutPage from "./pages/AboutPage";
 import { SearchProvider } from "./contexts/SearchContext";
 
 function App() {
+  const { showToast } = useToast();
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    const handleOffline = () => {
+      setIsOffline(true);
+      showToast("Server is unreachable. Please check your connection.", "error");
+    };
+
+    window.addEventListener("server-offline", handleOffline);
+    return () => window.removeEventListener("server-offline", handleOffline);
+  }, [showToast]);
+
   return (
     <SearchProvider>
       <div className="site-container">
+        {isOffline && (
+          <div className="offline-banner">
+            ⚠️ Server unreachable. Showing cached data.
+            <button onClick={() => window.location.reload()} className="retry-btn">Retry</button>
+          </div>
+        )}
         <Header />
         <main className="main-container">
         <Routes>
           <Route element={<PublicLayout />}>
-            <Route
-              path="/Login"
-              element={<LoginPage className="LoginPage-Site-Container" />}
-            />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <HomePage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/login" element={<LoginPage className="LoginPage-Site-Container" />} />
           </Route>
 
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route
-              path="/tasks"
-              element={
-                <ProtectedRoute>
-                  <TasksDisplayPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/tasks/:filter"
-              element={
-                <ProtectedRoute>
-                  <TasksDisplayPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/TaskDetail/:id"
-              element={
-                <ProtectedRoute>
-                  <TaskDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edit-profile"
-              element={
-                <ProtectedRoute>
-                  <EditProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create-task"
-              element={
-                <ProtectedRoute>
-                  <CreateTaskPage />
-                </ProtectedRoute>
-              }
-            />
+          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+
+          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            <Route path="/tasks" element={<TasksDisplayPage />} />
+            <Route path="/tasks/:filter" element={<TasksDisplayPage />} />
+            <Route path="/tasks/detail/:id" element={<TaskDetail />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route path="/create-task" element={<CreateTaskPage />} />
           </Route>
+          
           <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>

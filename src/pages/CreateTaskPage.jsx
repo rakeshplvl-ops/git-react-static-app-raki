@@ -2,9 +2,11 @@ import { useState, useRef } from "react";
 import "../css/task-form.css";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { useToast } from "../contexts/ToastContext";
 
 function CreateTaskPage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const fileInputRef = useRef(null);
   const [task, setTask] = useState({
     taskName: "",
@@ -33,14 +35,27 @@ function CreateTaskPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Task:", task);
+    
+    // Basic validation
+    if (!task.taskName.trim()) {
+      alert("Title is required");
+      return;
+    }
 
     try {
-      const res = await api.post("/Tasks/CreateTask", task);
-      console.log("Task created successfully:", res.data);
+      await api.post("/Tasks/CreateTask", {
+        taskName: task.taskName,
+        shortDescription: task.shortDescription || "empty",
+        longDescription: task.longDescription || "empty",
+        startDate: task.startDate,
+        endDate: task.endDate,
+        taskStatus: task.taskStatus,
+      });
+      showToast("Task created successfully!");
       navigate("/tasks");
     } catch (error) {
       console.error("Error creating task:", error);
+      showToast("Failed to create task", "error");
     }
   };
 
@@ -120,26 +135,7 @@ function CreateTaskPage() {
             />
           </div>
 
-          <div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              multiple
-              style={{ display: "none" }}
-            />
-            <label
-              className="task-form-file-label"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              + Add Files
-            </label>
-            {task.files.length > 0 && (
-              <span style={{ color: "#94a3b8", marginLeft: "8px" }}>
-                ({task.files.length} file{task.files.length > 1 ? "s" : ""} selected)
-              </span>
-            )}
-          </div>
+
 
           <div className="task-form-actions">
             <button

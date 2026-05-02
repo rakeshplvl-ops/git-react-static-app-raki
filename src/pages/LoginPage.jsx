@@ -3,6 +3,7 @@ import { useState } from "react";
 import "../css/LoginPage.css";
 import { useAuth } from "../contexts/useAuth";
 import api from "../services/api";
+import { useToast } from "../contexts/ToastContext";
 
 function LoginPage() {
   const [UserName, SetUserName] = useState("");
@@ -10,6 +11,7 @@ function LoginPage() {
   const [isRegister, SetIsRegister] = useState(false);
   const [Registered, SetRegistered] = useState(false);
   const { login } = useAuth();
+  const { showToast } = useToast();
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -41,7 +43,6 @@ function LoginPage() {
 
   // gets user data
   const fetchUserData = async (refreshToken) => {
-    console.log("Fetching user data with token:", refreshToken);
     try {
       // Backend expects [FromBody]string - needs JSON string format
       const res = await api.post(
@@ -51,7 +52,6 @@ function LoginPage() {
           headers: { "Content-Type": "application/json" },
         },
       );
-      console.log("User Data:", res.data);
       return res.data;
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -61,6 +61,16 @@ function LoginPage() {
 
   // login with creds
   const LoginUser = async () => {
+    // 🛡️ CLIENT-SIDE VALIDATION (Only for Registration)
+    if (isRegister) {
+      if (UserName.trim().length < 8) {
+        return showToast("Username must be at least 8 characters long for registration.", "error");
+      }
+      if (Password.trim().length < 8) {
+        return showToast("Password must be at least 8 characters long for registration.", "error");
+      }
+    }
+
     const endpoint = isRegister ? "/User/register" : "/User/login";
     const payload = {
       username: UserName,
@@ -69,37 +79,37 @@ function LoginPage() {
 
     try {
       const res = await api.post(endpoint, payload);
-      console.log("Success:", res.data);
       setIsError(false);
 
       if (isRegister) {
         return SetRegistered(true);
       }
 
-      // Fetch user data
+      // Fetch user data (Mandatory for a healthy session)
       const userData = await fetchUserData(res.data.refreshToken);
-
-      // Store user data for session persistence
+      
+      if (!userData) {
+        throw new Error("Login successful, but failed to retrieve profile details. Please try again.");
+      }
 
       // Update React state
       login(res.data.accessToken, res.data.refreshToken, userData);
-      console.log(
-        "check this",
-        res.data.accessToken,
-        res.data.refreshToken,
-        userData,
-      );
+
       // Navigate after login completes
       navigate("/");
     } catch (error) {
       setError(error.response?.data || "Login failed");
       setIsError(true);
-      console.error("Error:", error);
+      console.error("Error at login:", error);
     }
   };
 
   return (
     <div className="LoginPage-Container">
+      {/* 🔮 Background Decor */}
+      <div className="orb orb-1"></div>
+      <div className="orb orb-2"></div>
+
       {isError && (
         <div className="error-login">
           <p>{error}</p>

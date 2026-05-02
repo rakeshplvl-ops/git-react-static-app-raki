@@ -1,20 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
-import api from "../services/api";
 import {
   setTokens,
   clearTokens,
   setUserData,
   getUserData,
   clearUserData,
-  getRefreshToken,
 } from "../services/authStore";
 
 export function AuthProvider({ children }) {
   // Restore session synchronously from localStorage on first render
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(() => getUserData());
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!getUserData());
+  const [isLoading, setIsLoading] = useState(false); /* 👈 Start as false since storage check is synchronous */
 
   const login = useCallback((accessToken, refreshToken, userData) => {
     setTokens(accessToken, refreshToken);
@@ -30,37 +28,20 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false);
   }, []);
 
-  //app start
+  // On mount, we already initialized state from localStorage.
+  // We don't need to manually refresh here because the api.js interceptor 
+  // will handle it automatically on the first API call that returns a 401.
   useEffect(() => {
-    const initAuth = async () => {
-      const refreshToken = getRefreshToken();
-
-      if (!refreshToken) {
+    const handleStorageChange = () => {
+      const userData = getUserData();
+      if (!userData) {
+        setUser(null);
         setIsLoggedIn(false);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const res = await api.post("User/refresh", {
-          refreshToken,
-        });
-
-        setTokens(res.data.accessToken, res.data.refreshToken);
-
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.log(err);
-        clearTokens();
-        clearUserData();
-        setIsLoggedIn(false);
-      } finally {
-        setIsLoading(false); // 👈 always stop loading
       }
     };
 
-    initAuth();
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   // Always render the Provider so children can access context

@@ -36,7 +36,12 @@ function ProfileMenu() {
 
   return (
     <div style={{ position: "relative" }} ref={dropdownRef}>
-      <div onClick={() => setOpen(!open)}>👤</div>
+      <div 
+        onClick={() => setOpen(!open)} 
+        style={{ cursor: "pointer", padding: "4px", fontSize: "1.2rem" }}
+      >
+        👤
+      </div>
 
       {open && (
         <div className="dropdown">

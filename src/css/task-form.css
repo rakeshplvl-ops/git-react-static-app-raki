@@ -214,6 +214,17 @@
   background: #3f4554;
 }
 
+.task-form-btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-danger);
+  border: 1px solid var(--accent-danger);
+}
+
+.task-form-btn-danger:hover {
+  background: var(--accent-danger);
+  color: white;
+}
+
 /* Error message */
 .task-form-error {
   margin-top: 16px;
@@ -223,4 +234,30 @@
   border-radius: 10px;
   color: #fca5a5;
   font-size: 14px;
+}
+
+/* 📱 Mobile Button Optimization */
+@media (max-width: 600px) {
+  .task-form-actions {
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .task-form-btn {
+    padding: 8px 14px; /* Slimmer buttons */
+    font-size: 12px; /* Smaller text */
+    flex: 1; /* Allow buttons to share row space evenly */
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .task-form-card {
+    padding: 20px; /* Less padding for more screen area */
+  }
+
+  .task-form-card h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
 }

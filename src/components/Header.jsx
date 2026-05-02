@@ -4,6 +4,7 @@ import { useSearch } from "../contexts/SearchContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../css/header.css";
 import ProfileMenu from "./ProfileMenu";
+import { useToast } from "../contexts/ToastContext";
 
 function Header() {
   const [showMenu, setShowMenu] = useState(false);
@@ -11,17 +12,17 @@ function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
   const { isLoggedIn } = useAuth();
   const { searchQuery, setSearchQuery } = useSearch();
+  const { history, clearHistory } = useToast();
   const location = useLocation();
   const sidebarRef = useRef(null);
 
-  const showSearch =
-    location.pathname === "/tasks" || location.pathname === "/tasks/:filter";
+  const showSearch = location.pathname.startsWith("/tasks");
 
   const navigate = useNavigate();
 
-  const handleNotificationClick = () => {
+  const handleNotificationClick = (e) => {
+    e.stopPropagation();
     setShowNotification(!showNotification);
-    setTimeout(() => setShowNotification(false), 3000);
   };
 
   const handleSearchChange = (e) => {
@@ -33,44 +34,25 @@ function Header() {
     setShowSidebar(false);
   };
 
-  // Close sidebar on click outside
+  // Combined click-outside logic
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // Sidebar
       if (showSidebar && sidebarRef.current && !sidebarRef.current.contains(e.target) && !e.target.closest(".hamburger-btn")) {
         setShowSidebar(false);
+      }
+      // Notifications
+      if (showNotification && !e.target.closest(".notification-wrapper") && !e.target.closest(".header-mobile-notif")) {
+        setShowNotification(false);
+      }
+      // Profile menu
+      if (showMenu) {
+        setShowMenu(false);
       }
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
-  }, [showSidebar]);
-
-  useEffect(() => {
-    const handleClickOutside = () => setShowMenu(false);
-
-    if (showMenu) {
-      document.addEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [showMenu]);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".notification-wrapper")) {
-        setShowNotification(false);
-      }
-    };
-
-    if (showNotification) {
-      document.addEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [showNotification]);
+  }, [showSidebar, showNotification, showMenu]);
 
   return (
     <div className="header-container">
@@ -82,10 +64,67 @@ function Header() {
         </button>
         <h3 className="header-name" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Taskz</h3>
         <input type="text" disabled={!showSearch || !isLoggedIn} className="header-search" placeholder="search taskz" value={searchQuery} onChange={handleSearchChange} />
+        
+        {/* 📱 Mobile Notification Bell */}
+        <div className="header-mobile-notif notification-wrapper" onClick={handleNotificationClick}>
+          🔔
+          {history.length > 0 && <span className="notification-badge">{history.length}</span>}
+          {showNotification && (
+            <div className="notification-dropdown glass">
+              <div className="notification-header">
+                <span>Activity</span>
+                {history.length > 0 && (
+                  <button className="clear-all-btn" onClick={(e) => { e.stopPropagation(); clearHistory(); }}>Clear</button>
+                )}
+              </div>
+              <div className="notification-list">
+                {history.length === 0 ? (
+                  <div className="empty-notifications">No activity</div>
+                ) : (
+                  history.map((item) => (
+                    <div key={item.id} className={`notification-item ${item.type}`}>
+                      <span className="notif-icon">{item.type === "success" ? "✅" : "❌"}</span>
+                      <div className="notif-content">
+                        <p className="notif-msg">{item.message}</p>
+                        <span className="notif-time">{item.time}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="header-options">
           <div className="header-option notification-wrapper" onClick={handleNotificationClick}>
             🔔
-            {showNotification && (<div className="notification-tooltip">No new notifications</div>)}
+            {history.length > 0 && <span className="notification-badge">{history.length}</span>}
+            {showNotification && (
+              <div className="notification-dropdown glass">
+                <div className="notification-header">
+                  <span>Recent Activity</span>
+                  {history.length > 0 && (
+                    <button className="clear-all-btn" onClick={(e) => { e.stopPropagation(); clearHistory(); }}>Clear</button>
+                  )}
+                </div>
+                <div className="notification-list">
+                  {history.length === 0 ? (
+                    <div className="empty-notifications">No recent activity</div>
+                  ) : (
+                    history.map((item) => (
+                      <div key={item.id} className={`notification-item ${item.type}`}>
+                        <span className="notif-icon">{item.type === "success" ? "✅" : "❌"}</span>
+                        <div className="notif-content">
+                          <p className="notif-msg">{item.message}</p>
+                          <span className="notif-time">{item.time}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           <div className="profile-icon header-option"><ProfileMenu /></div>
           <div className="header-option" onClick={() => navigate("/about")}>❓</div>
@@ -98,6 +137,7 @@ function Header() {
           <>
             <div className="sidebar-item" onClick={() => handleSidebarNav("/")}>🏠 Home</div>
             <div className="sidebar-item" onClick={() => handleSidebarNav("/tasks")}>📋 Tasks</div>
+            <div className="sidebar-item" onClick={() => handleSidebarNav("/tasks/pending")}>⏳ Pending</div>
             <div className="sidebar-item" onClick={() => handleSidebarNav("/tasks/completed")}>✅ Completed</div>
             <div className="sidebar-item" onClick={() => handleSidebarNav("/create-task")}>➕ Create Task</div>
             <div className="sidebar-item" onClick={() => handleSidebarNav("/profile")}>👤 Profile</div>

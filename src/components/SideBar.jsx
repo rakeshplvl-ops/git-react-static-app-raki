@@ -1,10 +1,11 @@
 import "../css/component-css/sideBar.css";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function SideBar() {
   const options = [
     { name: "Home", link: "/" },
     { name: "Tasks", link: "/tasks" },
+    { name: "Pending", link: "/tasks/pending" },
     { name: "Completed", link: `/tasks/completed` },
     { name: "Create Task", link: "/create-task" },
     { name: "Profile", link: "/profile" },
@@ -13,9 +14,14 @@ function SideBar() {
     <div className="side-bar">
       {options.map((option, index) => (
         <div key={index} className="side-bar-option">
-          <Link className="side-bar-link" to={option.link}>
+          <NavLink 
+            className={({ isActive }) => `side-bar-link ${isActive ? "active" : ""}`} 
+            to={option.link}
+            // Ensure Home and Tasks don't highlight when on sub-pages
+            end={option.link === "/" || option.link === "/tasks"}
+          >
             <div className="link-text">{option.name}</div>
-          </Link>
+          </NavLink>
         </div>
       ))}
     </div>

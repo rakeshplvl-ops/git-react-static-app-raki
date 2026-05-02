@@ -1,0 +1,38 @@
+@keyframes pulse {
+  0% {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.skeleton-text {
+  height: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+  height: 2rem;
+  width: 60%;
+  margin-bottom: 1rem;
+}
+
+.skeleton-card {
+  height: 120px;
+  border-radius: 24px;
+}
+
+.skeleton-stat {
+  height: 100px;
+  border-radius: 24px;
+}
