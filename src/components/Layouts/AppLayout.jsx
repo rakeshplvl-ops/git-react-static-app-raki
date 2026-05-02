@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../Sidebar";
+import SideBar from "../SideBar";
 import { useToast } from "../../contexts/ToastContext";
 import { Outlet } from "react-router-dom";
 
@@ -7,7 +7,7 @@ function AppLayout() {
 
   return (
     <div className="app-layout" style={{ display: "flex", width: "100%" }}>
-      <Sidebar />
+      <SideBar />
       <div 
         className="main-content-wrapper"
         style={{ 
