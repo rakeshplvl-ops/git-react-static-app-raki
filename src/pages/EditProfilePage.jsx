@@ -12,7 +12,6 @@ function EditProfilePage() {
     name: user?.name || "",
     email: user?.email || "",
     contact: user?.contact || "",
-    username: user?.username || "",
     password: "",
     confirmPassword: "",
   });
@@ -43,7 +42,6 @@ function EditProfilePage() {
         name: formData.name,
         email: formData.email,
         contact: formData.contact,
-        username: formData.username,
       };
 
       if (formData.password) {
@@ -96,18 +94,6 @@ function EditProfilePage() {
               value={formData.name}
               onChange={handleChange}
               placeholder="Your name"
-              className="task-form-input"
-            />
-          </div>
-
-          <div className="task-form-group" style={{ marginBottom: "16px" }}>
-            <label className="task-form-label">Username</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Your username"
               className="task-form-input"
             />
           </div>

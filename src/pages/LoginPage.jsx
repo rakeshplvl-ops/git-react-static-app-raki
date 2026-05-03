@@ -66,10 +66,16 @@ function LoginPage() {
     // 🛡️ CLIENT-SIDE VALIDATION (Only for Registration)
     if (isRegister) {
       if (UserName.trim().length < 8) {
-        return showToast("Username must be at least 8 characters long for registration.", "error");
+        return showToast(
+          "Username must be at least 8 characters long for registration.",
+          "error",
+        );
       }
       if (Password.trim().length < 8) {
-        return showToast("Password must be at least 8 characters long for registration.", "error");
+        return showToast(
+          "Password must be at least 8 characters long for registration.",
+          "error",
+        );
       }
       if (!Email.includes("@")) {
         return showToast("Please enter a valid email address.", "error");
@@ -80,7 +86,7 @@ function LoginPage() {
     const payload = {
       username: UserName,
       password: Password,
-      ...(isRegister && { email: Email, contact: Contact })
+      ...(isRegister && { email: Email, contact: Contact }),
     };
 
     try {
@@ -93,9 +99,11 @@ function LoginPage() {
 
       // Fetch user data (Mandatory for a healthy session)
       const userData = await fetchUserData(res.data.refreshToken);
-      
+
       if (!userData) {
-        throw new Error("Login successful, but failed to retrieve profile details. Please try again.");
+        throw new Error(
+          "Login successful, but failed to retrieve profile details. Please try again.",
+        );
       }
 
       // Update React state
