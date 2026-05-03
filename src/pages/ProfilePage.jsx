@@ -40,7 +40,7 @@ function ProfilePage() {
       <div className="profile-card">
         <div className="avatar">👤</div>
 
-        <h2>{user.name}</h2>
+        <h2>{user.displayName || user.username}</h2>
         <p className="email">{user.email}</p>
 
         <div className="info">

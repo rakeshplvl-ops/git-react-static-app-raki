@@ -9,7 +9,8 @@ function EditProfilePage() {
   const navigate = useNavigate();
   const { user, login } = useAuth();
   const [formData, setFormData] = useState({
-    name: user?.name || "",
+    displayName: user?.displayName || "",
+    username: user?.username || "",
     email: user?.email || "",
     contact: user?.contact || "",
     password: "",
@@ -39,7 +40,8 @@ function EditProfilePage() {
     try {
       const updatePayload = {
         id: user.id,
-        name: formData.name,
+        displayName: formData.displayName,
+        username: formData.username,
         email: formData.email,
         contact: formData.contact,
       };
@@ -87,13 +89,25 @@ function EditProfilePage() {
 
         <form onSubmit={handleSubmit}>
           <div className="task-form-group" style={{ marginBottom: "16px" }}>
-            <label className="task-form-label">Name</label>
+            <label className="task-form-label">Display Name</label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="displayName"
+              value={formData.displayName}
               onChange={handleChange}
-              placeholder="Your name"
+              placeholder="Your display name"
+              className="task-form-input"
+            />
+          </div>
+
+          <div className="task-form-group" style={{ marginBottom: "16px" }}>
+            <label className="task-form-label">Username</label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Your username"
               className="task-form-input"
             />
           </div>

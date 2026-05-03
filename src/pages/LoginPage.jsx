@@ -6,7 +6,8 @@ import api from "../services/api";
 import { useToast } from "../contexts/ToastContext";
 
 function LoginPage() {
-  const [UserName, SetUserName] = useState("");
+  const [Username, SetUsername] = useState("");
+  const [DisplayName, SetDisplayName] = useState("");
   const [Password, SetPassword] = useState("");
   const [isRegister, SetIsRegister] = useState(false);
   const [Registered, SetRegistered] = useState(false);
@@ -65,11 +66,14 @@ function LoginPage() {
   const LoginUser = async () => {
     // 🛡️ CLIENT-SIDE VALIDATION (Only for Registration)
     if (isRegister) {
-      if (UserName.trim().length < 8) {
+      if (Username.trim().length < 8) {
         return showToast(
           "Username must be at least 8 characters long for registration.",
           "error",
         );
+      }
+      if (DisplayName.trim().length < 3) {
+        return showToast("Please provide a valid Display Name.", "error");
       }
       if (Password.trim().length < 8) {
         return showToast(
@@ -84,9 +88,9 @@ function LoginPage() {
 
     const endpoint = isRegister ? "/User/register" : "/User/login";
     const payload = {
-      username: UserName,
+      username: Username,
       password: Password,
-      ...(isRegister && { email: Email, contact: Contact }),
+      ...(isRegister && { displayName: DisplayName, email: Email, contact: Contact }),
     };
 
     try {
@@ -112,7 +116,12 @@ function LoginPage() {
       // Navigate after login completes
       navigate("/");
     } catch (error) {
-      setError(error.response?.data || "Login failed");
+      const errorData = error.response?.data;
+      const errorMessage = typeof errorData === 'object' && errorData !== null 
+        ? (errorData.message || JSON.stringify(errorData)) 
+        : (errorData || "Login failed");
+      
+      setError(errorMessage);
       setIsError(true);
       console.error("Error at login:", error);
     }
@@ -131,23 +140,38 @@ function LoginPage() {
       )}
       <div className="LoginPage-Inner-Container">
         <div className="input-container">
-          <label className="inputLabel" htmlFor="UserName">
+          <label className="inputLabel" htmlFor="Username">
             Username
           </label>
           <input
             className="inputText"
             type="text"
-            name="UserName"
-            id="UserName"
-            value={UserName}
+            name="Username"
+            id="Username"
+            value={Username}
             onChange={(e) => {
-              SetUserName(e.target.value);
+              SetUsername(e.target.value);
             }}
           />
         </div>
 
         {isRegister && (
           <>
+            <div className="input-container">
+              <label className="inputLabel" htmlFor="DisplayName">
+                Display Name
+              </label>
+              <input
+                className="inputText"
+                type="text"
+                name="DisplayName"
+                id="DisplayName"
+                value={DisplayName}
+                onChange={(e) => {
+                  SetDisplayName(e.target.value);
+                }}
+              />
+            </div>
             <div className="input-container">
               <label className="inputLabel" htmlFor="Email">
                 Email

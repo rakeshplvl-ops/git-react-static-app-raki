@@ -121,7 +121,7 @@ function HomePage() {
   return (
     <div className="home-container fade-in">
       <section className="hero">
-        <h1 className="hometitle">Welcome back, <span className="highlight">{user?.name || " "}</span></h1>
+        <h1 className="hometitle">Welcome back, <span className="highlight">{user?.displayName || user?.username || " "}</span></h1>
         <p className="subtitle">
           {stats.pending > 0
             ? `You have ${stats.pending} tasks to tackle today. Ready to crush them?`
