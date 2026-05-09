@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
   // Restore session synchronously from localStorage on first render
   const [user, setUser] = useState(() => getUserData());
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getUserData());
-  const [isLoading, setIsLoading] = useState(false); /* 👈 Start as false since storage check is synchronous */
+  const [isLoading, setIsLoading] = useState(false);
 
   const login = useCallback((accessToken, refreshToken, userData) => {
     setTokens(accessToken, refreshToken);
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   // On mount, we already initialized state from localStorage.
-  // We don't need to manually refresh here because the api.js interceptor 
+  // We don't need to manually refresh here because the api.js interceptor
   // will handle it automatically on the first API call that returns a 401.
   useEffect(() => {
     const handleStorageChange = () => {

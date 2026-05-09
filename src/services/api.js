@@ -97,7 +97,9 @@ api.interceptors.response.use(
     // 🌐 GLOBAL OFFLINE DETECTION
     if (!error.response) {
       console.error("Backend server is unreachable.");
-      window.dispatchEvent(new CustomEvent("server-offline", { detail: "Server is unreachable" }));
+      window.dispatchEvent(
+        new CustomEvent("server-offline", { detail: "Server is unreachable" }),
+      );
       return Promise.reject(error);
     }
 

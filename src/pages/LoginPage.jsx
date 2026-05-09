@@ -4,6 +4,7 @@ import "../css/LoginPage.css";
 import { useAuth } from "../contexts/useAuth";
 import api from "../services/api";
 import { useToast } from "../contexts/ToastContext";
+import { setTokens } from "../services/authStore";
 
 function LoginPage() {
   const [Username, SetUsername] = useState("");
@@ -13,6 +14,7 @@ function LoginPage() {
   const [Registered, SetRegistered] = useState(false);
   const [Email, SetEmail] = useState("");
   const [Contact, SetContact] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
   const [isError, setIsError] = useState(false);
@@ -90,7 +92,11 @@ function LoginPage() {
     const payload = {
       username: Username,
       password: Password,
-      ...(isRegister && { displayName: DisplayName, email: Email, contact: Contact }),
+      ...(isRegister && {
+        displayName: DisplayName,
+        email: Email,
+        contact: Contact,
+      }),
     };
 
     try {
@@ -100,6 +106,9 @@ function LoginPage() {
       if (isRegister) {
         return SetRegistered(true);
       }
+
+      // We MUST set tokens here so that fetchUserData uses the new access token
+      setTokens(res.data.accessToken, res.data.refreshToken);
 
       // Fetch user data (Mandatory for a healthy session)
       const userData = await fetchUserData(res.data.refreshToken);
@@ -117,12 +126,14 @@ function LoginPage() {
       navigate("/");
     } catch (error) {
       const errorData = error.response?.data;
-      const errorMessage = typeof errorData === 'object' && errorData !== null
-        ? (errorData.message || JSON.stringify(errorData))
-        : (errorData || "Login failed");
+      const errorMessage =
+        typeof errorData === "object" && errorData !== null
+          ? errorData.message || JSON.stringify(errorData)
+          : errorData || "Login failed";
 
       setError(errorMessage);
       setIsError(true);
+      showToast(errorMessage, "error");
       console.error("Error at login:", error);
     }
   };
@@ -138,7 +149,10 @@ function LoginPage() {
           <p>{error}</p>
         </div>
       )}
-      <form className="LoginPage-Inner-Container">
+      <form className="LoginPage-Inner-Container" onSubmit={(e) => {
+        e.preventDefault();
+        LoginUser();
+      }}>
         <div className="input-container">
           <label className="inputLabel" htmlFor="Username">
             Username
@@ -209,22 +223,38 @@ function LoginPage() {
           <label className="inputLabel" htmlFor="password">
             Password
           </label>
-          <input
-            className="inputText"
-            type="password"
-            name="password"
-            id="password"
-            value={Password}
-            onChange={(e) => {
-              SetPassword(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") LoginUser();
-            }}
-          />
+          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <input
+              className="inputText"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              id="password"
+              value={Password}
+              onChange={(e) => {
+                SetPassword(e.target.value);
+              }}
+              style={{ paddingRight: "40px" }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "12px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "0",
+                fontSize: "1.1rem"
+              }}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? "👁️" : "🙈"}
+            </button>
+          </div>
         </div>
         <div className="submit-container">
-          <button className="SubmitBtn" onClick={LoginUser}>
+          <button type="submit" className="SubmitBtn">
             {isRegister ? "Register" : "Login"}
           </button>
           <div className="register-login">
