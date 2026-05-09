@@ -6,7 +6,7 @@ function ProtectedRoute({ children }) {
   console.log("protected route", isLoggedIn);
 
   if (isLoading) {
-    return <div style={{ color: "white" }}>Loading...</div>; // 👈 or spinner
+    return <div style={{ color: "white" }}>Loading...</div>;
   }
 
   if (!isLoggedIn) {

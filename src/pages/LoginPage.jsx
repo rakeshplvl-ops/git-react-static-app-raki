@@ -117,10 +117,10 @@ function LoginPage() {
       navigate("/");
     } catch (error) {
       const errorData = error.response?.data;
-      const errorMessage = typeof errorData === 'object' && errorData !== null 
-        ? (errorData.message || JSON.stringify(errorData)) 
+      const errorMessage = typeof errorData === 'object' && errorData !== null
+        ? (errorData.message || JSON.stringify(errorData))
         : (errorData || "Login failed");
-      
+
       setError(errorMessage);
       setIsError(true);
       console.error("Error at login:", error);
@@ -138,7 +138,7 @@ function LoginPage() {
           <p>{error}</p>
         </div>
       )}
-      <div className="LoginPage-Inner-Container">
+      <form className="LoginPage-Inner-Container">
         <div className="input-container">
           <label className="inputLabel" htmlFor="Username">
             Username
@@ -239,7 +239,7 @@ function LoginPage() {
             <a className="ForgotPassword">Forgot Password ?</a>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
